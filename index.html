@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JoSEII — Ruta del día</title>
+<style>
+  :root {
+    --bg: #FBFAF7;
+    --surface: #FFFFFF;
+    --surface-2: #F4F2EC;
+    --border: #E4E1D8;
+    --text-primary: #1F3844;
+    --text-secondary: #4A4A46;
+    --text-muted: #8A8883;
+    --line: #D8D5CC;
+
+    --green-bg: #EAF3DE; --green-line: #3B6D11; --green-text: #27500A;
+    --teal-bg:  #E1F5EE; --teal-line:  #0F6E56; --teal-text:  #085041;
+    --amber-bg: #FAEEDA; --amber-line: #854F0B; --amber-text: #633806;
+    --purple-bg:#EEEDFE; --purple-line:#534AB7; --purple-text:#3C3489;
+    --pink-bg:  #FBEAF0; --pink-line:  #993556; --pink-text:  #72243E;
+    --navy-bg:  #E7EBEF; --navy-line:  #1F3844; --navy-text:  #1F3844;
+    --red-bg:   #FBEAEA; --red-line:   #B23B3B; --red-text:   #7A2020;
+
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1D1E;
+      --surface: #232527;
+      --surface-2: #2A2C2E;
+      --border: #3A3C3D;
+      --text-primary: #F2F0EA;
+      --text-secondary: #C9C7C0;
+      --text-muted: #8C8B86;
+      --line: #45474A;
+
+      --green-bg: #253A17; --green-line: #8FCB55; --green-text: #B8E28C;
+      --teal-bg:  #123B31; --teal-line:  #59CBAE; --teal-text:  #97E3CE;
+      --amber-bg: #3A2C13; --amber-line: #E0AC55; --amber-text: #F0CC93;
+      --purple-bg:#28244A; --purple-line:#9C93E8; --purple-text:#C2BCF3;
+      --pink-bg:  #3A1F29; --pink-line:  #E38CAE; --pink-text:  #F0B7CE;
+      --navy-bg:  #232E33; --navy-line:  #A9C2CC; --navy-text:  #D7E4E8;
+      --red-bg:   #3A1E1E; --red-line:   #E08787; --red-text:   #F0B8B8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1D1E; --surface: #232527; --surface-2: #2A2C2E; --border: #3A3C3D;
+    --text-primary: #F2F0EA; --text-secondary: #C9C7C0; --text-muted: #8C8B86; --line: #45474A;
+    --green-bg: #253A17; --green-line: #8FCB55; --green-text: #B8E28C;
+    --teal-bg:  #123B31; --teal-line:  #59CBAE; --teal-text:  #97E3CE;
+    --amber-bg: #3A2C13; --amber-line: #E0AC55; --amber-text: #F0CC93;
+    --purple-bg:#28244A; --purple-line:#9C93E8; --purple-text:#C2BCF3;
+    --pink-bg:  #3A1F29; --pink-line:  #E38CAE; --pink-text:  #F0B7CE;
+    --navy-bg:  #232E33; --navy-line:  #A9C2CC; --navy-text:  #D7E4E8;
+    --red-bg:   #3A1E1E; --red-line:   #E08787; --red-text:   #F0B8B8;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner { padding: 14px 18px 10px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase; }
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 10px 18px 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg);
+    border-color: var(--text-primary);
+  }
+
+  main { max-width: 640px; margin: 0 auto; padding: 18px 18px 40px; }
+
+  .progress-wrap { margin: 4px 0 22px; }
+  .progress-label { display:flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px;}
+  .progress-bar { height: 7px; background: var(--surface-2); border-radius: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--text-primary); border-radius: 6px; transition: width .3s ease; }
+
+  .name-title { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: 26px; margin: 0 0 2px; }
+  .name-sub { font-size: 12px; letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 20px; }
+
+  .timeline { position: relative; padding-left: 44px; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 8px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .block { position: relative; margin-bottom: 26px; }
+  .dot {
+    position: absolute;
+    left: -44px; top: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dot::after { content:""; width: 6px; height: 6px; border-radius: 50%; background: var(--surface); }
+  .hora { position: absolute; left: -170px; top: 0px; width: 118px; text-align: right; font-size: 13px; font-weight: 700; }
+  .hora2 { display:block; font-size: 10.5px; font-weight: 400; color: var(--text-muted); }
+
+  .titulo { font-size: 16px; font-weight: 700; margin: 0 0 8px; padding-top: 1px; }
+  .section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; color: var(--text-muted); margin: 8px 0 4px; }
+  .nota { font-size: 12.5px; font-style: italic; color: var(--text-muted); margin: 4px 0; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 5px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .task input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    min-width: 18px;
+    border: 1.4px solid var(--text-muted);
+    border-radius: 5px;
+    margin-top: 1px;
+    position: relative;
+    cursor: pointer;
+    background: var(--surface);
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 5px; height: 9px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .task-text { font-size: 14px; line-height: 1.4; color: var(--text-secondary); }
+  .task.done .task-text { color: var(--text-muted); text-decoration: line-through; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .chip.pending {
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+    background: none;
+    padding: 6px 0;
+  }
+
+  .summary-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+  .summary-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .summary-name { font-weight: 700; font-size: 15px; }
+  .summary-area { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em;}
+  .summary-pct { font-size: 13px; color: var(--text-muted); }
+
+  .day-progress {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .day-progress-top { display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;}
+  .day-progress-title { font-weight: 700; font-size: 14px; }
+  .semaphore { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+  .semaphore-green { background: var(--green-bg); color: var(--green-text); }
+  .semaphore-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .semaphore-red   { background: var(--red-bg); color: var(--red-text); }
+  .day-bar { position: relative; height: 8px; background: var(--surface-2); border-radius: 6px; margin-bottom: 6px; }
+  .day-bar-fill { position:absolute; left:0; top:0; height:100%; background: var(--line); border-radius: 6px; }
+  .day-bar-now { position:absolute; top:-3px; width:2px; height:14px; background: var(--text-primary); border-radius: 2px; }
+  .day-bar-labels { display:flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+  footer { max-width: 640px; margin: 10px auto 30px; padding: 0 18px; font-size: 12px; color: var(--text-muted); font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">JoSEII 2026 · Comité de logística</div>
+    <h1>Ruta del día</h1>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+
+<main id="main"></main>
+<footer>Tocá cada tarea para marcarla. <span id="mode-note">Guardando…</span> Teléfonos y ubicaciones son tocables desde el celular.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://pgkxpajurmrgaapztowf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4c_ZaIjg4gXDx2oqCrTppw_UxiyvFyx";
+const SUPABASE_POLL_MS = 15000;
+const PEOPLE = {
+  jose: {
+    name: "Jose", area: "Logística",
+    blocks: [
+      { hora:"07:00", hora2:"07:30", titulo:"Llegada y recepción de traffics / micros", color:"green",
+        tareas:["Dejar los kits en el aula asignada.","Recibir micros y traffics."],
+        chequear:["Que cada responsable de zona tenga a su grupo ordenado y listo para acreditar."],
+        contactos:[["Elena","2615278384"],["Jorge","2615072042"]] },
+      { hora:"07:30", hora2:"09:20", titulo:"Acreditaciones y salida de visitas técnicas", color:"green",
+        tareas:["Acreditar a cada grupo.","Despedir traffics y micros a medida que salen."],
+        chequear:["La última traffic sale a las 9:20 — de ahí en más, liberada de visitas técnicas."],
+        contactos:[["Elena","2615278384"],["Jorge","2615072042"]] },
+      { hora:"09:20", hora2:"11:00", titulo:"Preparación talleres y anfiteatro", color:"teal",
+        tareas:["Dejar proyectores prendidos y probados en cada aula.",
+                 "Armar los kits (bolsita + alfajor + agua) para los profesionales.",
+                 "Coordinar con Buffet el café de recepción.",
+                 "Acomodar sillas del anfiteatro si hace falta."],
+        chequear:["Sonido y audio de cada aula de taller y del anfiteatro."],
+        contactos:[["Buffet","261182139"]] },
+      { hora:"A definir", titulo:"Preparación almuerzo", color:"amber",
+        tareas:["Ir a buscar la comida.","Definir dónde se deja.","Armar la mesa de entrega."],
+        ubicacion:["Ver ubicación de retiro","https://maps.app.goo.gl/WzfpD3t7n7LpFXca6"] },
+      { hora:"A definir", titulo:"Preparación charla / apertura", color:"purple",
+        tareas:["Segundo chequeo de sonido.","Acomodar a los que acreditan.","Dar inicio a la apertura y el panel."] },
+      { hora:"15:00", titulo:"Coffee break", color:"pink",
+        tareas:["Hablar con Buffet.","Ver qué necesitan.","Definir dónde se arma.","Ayudar a montarlo."],
+        contactos:[["Buffet","261182139"]] },
+      { hora:"A definir", titulo:"Preparación conferencia magistral", color:"purple",
+        tareas:["Estar lista para acreditar."] },
+      { hora:"A definir", titulo:"Cierre JoSEII", color:"navy",
+        tareas:["Cierre de la jornada."] },
+    ]
+  },
+  tato: {
+    name: "Tato", area: "Finanzas",
+    blocks: [
+      { hora:"07:30", hora2:"08:00", titulo:"Citación en la facultad", color:"green",
+        tareas:["Llegar a la facultad."] },
+      { hora:"08:00", hora2:"08:25", titulo:"Fila y salida hacia Cumbrar (micro 2, con Malnis)", color:"green",
+        tareas:["Hacer la fila de acreditación antes de subir al micro 2.",
+                 "Explicar el evento y cómo se acredita la visita técnica (primera acreditación del día)."],
+        contactos:[["Malnis",""],["Chofer micro 2",""]] },
+      { hora:"08:25", hora2:"10:30", titulo:"En Cumbrar (visita técnica)", color:"green",
+        tareas:["Acompañar la visita técnica en Cumbrar."],
+        nota:"Viaje de ida ~35 minutos.",
+        ubicacion:["Ver ubicación de Cumbrar (pendiente)",""] },
+      { hora:"10:30", hora2:"11:10", titulo:"Regreso a la facultad", color:"green",
+        tareas:["Volver en el micro 2 hacia la facultad junto con Malnis."] },
+      { hora:"11:10", hora2:"11:30", titulo:"Preparación talleres", color:"teal",
+        tareas:["Buscar los kits para entregar a cada alumno.",
+                 "Prepararse para acreditar a los alumnos del taller asignado."],
+        contactos:[["Responsable del taller",""],["Académicas",""]] },
+      { hora:"11:30", hora2:"13:00", titulo:"Taller asignado", color:"teal",
+        tareas:["Acreditar a los alumnos del taller.",
+                 "Acompañar el desarrollo del taller.",
+                 "Entregar un reconocimiento al responsable del taller al finalizar."],
+        nota:"Los kits ya fueron entregados a cada participante al principio.",
+        contactos:[["Responsable del taller",""],["Académicas",""]] },
+      { hora:"13:00", titulo:"Almuerzo", color:"amber",
+        tareas:["Llevar a la gente hacia el lugar del almuerzo.","Entregar el almuerzo.","Ver que todo esté bien."],
+        nota:"Hasta 10 minutos antes de la acreditación de la apertura." },
+      { hora:"A definir", titulo:"Acreditación y apertura", color:"purple",
+        tareas:["Estar listos para acreditar antes de que empiece la apertura.",
+                 "Estar presentes en el aula para la entrega de la mención especial.",
+                 "Participar del panel."] },
+      { hora:"16:00", titulo:"Coffee break", color:"pink",
+        tareas:["Estar presente en el coffee break.","Ver que todo esté bien."] },
+      { hora:"16:40", titulo:"Vuelta a Gobierno — acreditación charlas de la tarde", color:"purple",
+        tareas:["Acreditar a las personas para las últimas charlas de la tarde.",
+                 "Estar presentes en las dos charlas magistrales."] },
+      { hora:"A definir", titulo:"Cierre JoSEII", color:"navy",
+        tareas:["Cierre de la jornada."] },
+    ]
+  }
+};
+
+// Assign stable ids to every task
+Object.keys(PEOPLE).forEach(pid => {
+  PEOPLE[pid].blocks.forEach((b, bi) => {
+    b._taskIds = (b.tareas||[]).map((_, ti) => `${bi}.t${ti}`);
+    b._chequearIds = (b.chequear||[]).map((_, ti) => `${bi}.c${ti}`);
+  });
+});
+
+let db = null;
+let supa = null;
+let mode = "pending"; // "claude" | "supabase" | "local"
+let currentView = "resumen";
+const doneState = {}; // { personId: { taskId: true } }
+const unsubs = {};
+
+function localKey(pid) { return "joseii_done_" + pid; }
+function loadLocal(pid) {
+  try {
+    const raw = localStorage.getItem(localKey(pid));
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function saveLocal(pid, data) {
+  try { localStorage.setItem(localKey(pid), JSON.stringify(data)); } catch (e) {}
+}
+
+function initSupabase() {
+  try {
+    if (typeof supabase === "undefined" || !SUPABASE_URL || !SUPABASE_KEY) return null;
+    return supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch (e) { return null; }
+}
+async function fetchAllSupabase() {
+  if (!supa) return;
+  try {
+    const { data, error } = await supa.from("checklist").select("*");
+    if (error) { console.error("Supabase select error", error); return; }
+    (data || []).forEach(row => { doneState[row.person] = row.done || {}; });
+    render();
+  } catch (e) { console.error(e); }
+}
+async function writeSupabase(pid) {
+  if (!supa) return;
+  try {
+    const { error } = await supa.from("checklist").upsert({ person: pid, done: doneState[pid] });
+    if (error) console.error("Supabase upsert error", error);
+  } catch (e) { console.error(e); }
+}
+
+function totalTasks(pid) {
+  let n = 0;
+  PEOPLE[pid].blocks.forEach(b => { n += (b.tareas||[]).length + (b.chequear||[]).length; });
+  return n;
+}
+function doneCount(pid) {
+  const d = doneState[pid] || {};
+  return Object.values(d).filter(Boolean).length;
+}
+
+const DAY_START = 7*60;      // 07:00
+const DAY_END = 19*60 + 30;  // 19:30
+
+function parseHora(h) {
+  if (!h) return null;
+  const m = String(h).match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1],10)*60 + parseInt(m[2],10);
+}
+function minutesToHHMM(m) {
+  m = Math.max(0, Math.round(m));
+  const h = Math.floor(m/60), mm = m%60;
+  return String(h).padStart(2,'0') + ":" + String(mm).padStart(2,'0');
+}
+function computeDayStatus(nowMin) {
+  let expected = 0, overdue = 0;
+  Object.keys(PEOPLE).forEach(pid => {
+    PEOPLE[pid].blocks.forEach(b => {
+      const start = parseHora(b.hora);
+      if (start === null) return;
+      const due = b.hora2 ? parseHora(b.hora2) : start + 30;
+      const ids = [...(b._taskIds||[]), ...(b._chequearIds||[])];
+      ids.forEach(tid => {
+        if (nowMin >= start) {
+          expected++;
+          const isDone = !!(doneState[pid] && doneState[pid][tid]);
+          if (nowMin > due && !isDone) overdue++;
+        }
+      });
+    });
+  });
+  return { expected, overdue };
+}
+function renderDayProgress() {
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const { expected, overdue } = computeDayStatus(nowMin);
+  const pct = Math.min(100, Math.max(0, (nowMin - DAY_START) / (DAY_END - DAY_START) * 100));
+
+  let level = "green", label = "Al día";
+  if (nowMin < DAY_START) { level = "green"; label = "Todavía no arranca"; }
+  else if (expected > 0) {
+    const frac = overdue / expected;
+    if (frac > 0.2) { level = "red"; label = "Atrasado"; }
+    else if (frac > 0) { level = "amber"; label = "Va más o menos"; }
+  }
+  const extra = overdue > 0 ? ` · ${overdue} tarea${overdue>1?'s':''} atrasada${overdue>1?'s':''}` : "";
+
+  return `<div class="day-progress">
+    <div class="day-progress-top">
+      <span class="day-progress-title">Progreso de la jornada</span>
+      <span class="semaphore semaphore-${level}">${label}${extra}</span>
+    </div>
+    <div class="day-bar">
+      <div class="day-bar-fill" style="width:${pct}%"></div>
+      <div class="day-bar-now" style="left:calc(${pct}% - 1px)"></div>
+    </div>
+    <div class="day-bar-labels"><span>07:00</span><span>ahora ${minutesToHHMM(nowMin)}</span><span>19:30</span></div>
+  </div>`;
+}
+
+
+function renderTabs() {
+  const tabs = document.getElementById("tabs");
+  const items = [["resumen","Resumen"]].concat(Object.keys(PEOPLE).map(pid => [pid, PEOPLE[pid].name]));
+  tabs.innerHTML = items.map(([id,label]) =>
+    `<div class="tab ${currentView===id?'active':''}" data-view="${id}">${label}</div>`
+  ).join("");
+  tabs.querySelectorAll(".tab").forEach(el => {
+    el.addEventListener("click", () => { currentView = el.dataset.view; render(); });
+  });
+}
+
+function renderSummary() {
+  const main = document.getElementById("main");
+  const cards = Object.keys(PEOPLE).map(pid => {
+    const p = PEOPLE[pid];
+    const total = totalTasks(pid);
+    const done = doneCount(pid);
+    const pct = total ? Math.round(done/total*100) : 0;
+    return `<div class="summary-card" data-view="${pid}">
+      <div class="summary-top">
+        <span class="summary-name">${p.name}</span>
+        <span class="summary-pct">${done}/${total}</span>
+      </div>
+      <div class="summary-area">${p.area}</div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join("");
+  main.innerHTML = `<div style="margin-bottom:14px; color:var(--text-muted); font-size:13px;">Avance de cada persona en su ruta del día.</div>`
+    + renderDayProgress() + cards;
+  main.querySelectorAll(".summary-card").forEach(el => {
+    el.addEventListener("click", () => { currentView = el.dataset.view; render(); });
+  });
+}
+
+function renderPerson(pid) {
+  const p = PEOPLE[pid];
+  const main = document.getElementById("main");
+  const total = totalTasks(pid);
+  const done = doneCount(pid);
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  let html = `
+    <div class="name-title">${p.name}</div>
+    <div class="name-sub">${p.area}</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Progreso</span><span>${done}/${total} tareas</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="timeline">`;
+
+  p.blocks.forEach((b, bi) => {
+    html += `<div class="block">
+      <div class="hora" style="color:var(--${b.color}-text)">${b.hora}${b.hora2?`<span class="hora2">a ${b.hora2}</span>`:''}</div>
+      <div class="dot" style="background:var(--${b.color}-line)"></div>
+      <div class="titulo">${b.titulo}</div>`;
+
+    if (b.tareas && b.tareas.length) {
+      html += `<div class="section-label">Tareas</div>`;
+      b.tareas.forEach((t, ti) => {
+        const tid = b._taskIds[ti];
+        const isDone = !!(doneState[pid] && doneState[pid][tid]);
+        html += `<label class="task ${isDone?'done':''}" data-pid="${pid}" data-tid="${tid}">
+          <input type="checkbox" ${isDone?'checked':''}>
+          <span class="task-text">${t}</span>
+        </label>`;
+      });
+    }
+    if (b.chequear && b.chequear.length) {
+      html += `<div class="section-label">Chequear</div>`;
+      b.chequear.forEach((t, ti) => {
+        const tid = b._chequearIds[ti];
+        const isDone = !!(doneState[pid] && doneState[pid][tid]);
+        html += `<label class="task ${isDone?'done':''}" data-pid="${pid}" data-tid="${tid}">
+          <input type="checkbox" ${isDone?'checked':''}>
+          <span class="task-text">${t}</span>
+        </label>`;
+      });
+    }
+    if (b.nota) html += `<div class="nota">${b.nota}</div>`;
+
+    const chips = [];
+    (b.contactos||[]).forEach(([nombre, tel]) => {
+      if (tel) chips.push(`<a class="chip" href="tel:${tel}" style="background:var(--${b.color}-bg);color:var(--${b.color}-line)">☎ ${nombre} · ${tel}</a>`);
+      else chips.push(`<span class="chip pending">☎ ${nombre} — contacto pendiente</span>`);
+    });
+    if (b.ubicacion) {
+      const [label, url] = b.ubicacion;
+      if (url) chips.push(`<a class="chip" href="${url}" target="_blank" style="background:var(--${b.color}-bg);color:var(--${b.color}-line)">⌖ ${label}</a>`);
+      else chips.push(`<span class="chip pending">⌖ ${label}</span>`);
+    }
+    if (chips.length) html += `<div class="chips">${chips.join("")}</div>`;
+
+    html += `</div>`;
+  });
+
+  html += `</div>`;
+  main.innerHTML = html;
+
+  main.querySelectorAll(".task").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleTask(el.dataset.pid, el.dataset.tid);
+    });
+  });
+}
+
+function render() {
+  renderTabs();
+  if (currentView === "resumen") renderSummary();
+  else renderPerson(currentView);
+}
+
+async function toggleTask(pid, tid) {
+  doneState[pid] = doneState[pid] || {};
+  const newVal = !doneState[pid][tid];
+  doneState[pid][tid] = newVal;
+  render();
+
+  if (db) {
+    try {
+      const ref = db.doc(`checklist/${pid}`);
+      try {
+        await ref.update({ done: { [tid]: newVal } });
+      } catch (err) {
+        if (err && err.code === "invalid_argument") {
+          await ref.set({ done: { [tid]: newVal } });
+        }
+      }
+    } catch (err) {
+      console.error("No se pudo guardar", err);
+    }
+  } else if (supa) {
+    saveLocal(pid, doneState[pid]);
+    writeSupabase(pid);
+  } else {
+    saveLocal(pid, doneState[pid]);
+  }
+}
+
+function subscribePerson(pid) {
+  if (!db) return;
+  const ref = db.doc(`checklist/${pid}`);
+  unsubs[pid] = ref.onSnapshot((snap) => {
+    const data = snap.exists ? (snap.data() || {}) : {};
+    doneState[pid] = data.done || {};
+    render();
+  }, (err) => {
+    console.error("db error", pid, err);
+  });
+}
+
+// Paint immediately from local storage so there's no blank flash
+Object.keys(PEOPLE).forEach(pid => { doneState[pid] = loadLocal(pid); });
+render();
+setInterval(() => { if (currentView === "resumen") render(); }, 60000);
+
+(async () => {
+  try {
+    db = (typeof claude !== "undefined") ? await claude.use("db") : null;
+  } catch (e) {
+    db = null;
+  }
+
+  const note = document.getElementById("mode-note");
+
+  if (db) {
+    mode = "claude";
+    Object.keys(PEOPLE).forEach(subscribePerson);
+    if (note) note.textContent = "Los cambios se guardan y los ve todo el equipo.";
+    return;
+  }
+
+  supa = initSupabase();
+  if (supa) {
+    mode = "supabase";
+    await fetchAllSupabase();
+    setInterval(fetchAllSupabase, SUPABASE_POLL_MS);
+    if (note) note.textContent = "Los cambios se guardan y los ve todo el equipo (actualiza cada 15 segundos).";
+  } else {
+    mode = "local";
+    if (note) note.textContent = "Los cambios se guardan solo en este dispositivo (no se comparten entre personas).";
+  }
+})();
+</script>
+</body>
+</html>
